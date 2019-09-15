@@ -3,7 +3,7 @@ import sys
 import asyncio
 from socket import gethostbyname
 
-from appPublic.uniqueID import getId
+from appPublic.uniqueID import getID
 from appPublic.jsonConfig import getConfig
 from appPublic.rsa import RSA
 from appPublic.dictObject import DictObject
@@ -121,6 +121,7 @@ class CenterProtocol(TextUDPProtocol):
 		self.send(msg,nodeinfo.internetinfo)
 
 if __name__ == '__main__':
+	from appPublic.folderUtils import ProgramPath
 	pp = ProgramPath()
 	workdir = pp
 	if len(sys.argv) > 1:
