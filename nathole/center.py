@@ -44,7 +44,7 @@ class CenterProtocol(TextUDPProtocol):
 
 	def onlinelist(self,d):
 		resp = {
-			"cmd":"onlinelistresp"
+			"cmd":"onlinelistresp",
 			"onlinelist":[i for i in self.nodeinfo.keys() if i!=d.sender ]
 		}
 		
