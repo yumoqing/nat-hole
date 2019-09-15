@@ -95,7 +95,7 @@ class CenterProtocol(TextUDPProtocol):
                 }
 
 		"""
-		nodeinfo = self.nodeinfo.get(d.peername):
+		nodeinfo = self.nodeinfo.get(d.peername)
 		retdata = {}
 		if nodeinfo is None:
 			retdata={
