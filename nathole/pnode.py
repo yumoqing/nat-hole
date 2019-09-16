@@ -38,6 +38,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.cpd = NodePeerData(config.nodeid,config.privatekey)
 		self.local_ip = getlocalip()
 		self.commands={
+			"greeting":self.greeting,
 			"heartbeatresp":self.heartbeatresp,
 			"getpeerinforesp":self.getpeerinfo,
 			"forwardmsgresp":self.forwardmsgresp,
@@ -52,9 +53,19 @@ class NodeProtocol(TextUDPProtocol):
 			return
 		return func(data)
 
+	def greeting(self,d):
+		print(self.config.nodeid,'greeting(),d=',d)
+		
 	def b_connect_a(self,d):
-		print('b_connect_a',d)
+		print(self.config.nodeid, 'b_connect_a(),d=',d)
 		self.direct_addrs[d.sender] = d.sender_addr
+		d = {
+			"cmd":"greeting",
+			"msg":"Hello peer ' + d.sender
+		}
+		text = json.dumps(d)
+		msg = self.cpd.setSendData(d.sender,text)
+		self.send(msg, d.sender_addr)
 
 	def a_connect_b(self,d):
 		print('a_connect_b',d)
@@ -104,6 +115,8 @@ class NodeProtocol(TextUDPProtocol):
 		txt = json.dumps(d)
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)
+		loop = asyncio.get_event_loop()
+		loop.call_later(60, self.getpeerinfo,peername)
 
 	def atSameNAT(self,addr):
 		ips = addr[0].split('.')
@@ -122,7 +135,7 @@ class NodeProtocol(TextUDPProtocol):
 			"innerinfo":addr1
 		}
 		"""
-		print('getpeeriforesp',d)
+		print(self.config.nodeid,'getpeeriforesp(),d=',d)
 		rpubk = d.publickey
 		self.cpd.publickeys[d.peername] = rpubk
 		retdata = {
@@ -145,7 +158,7 @@ class NodeProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		print('forwardmsgresp',d)
+		print(self.config.nodeid,'forwardmsgresp(),d=',d)
 		if d.forwardto[0] != self.config.nodeid:
 			return
 
