@@ -73,6 +73,7 @@ class NodeProtocol(TextUDPProtocol):
 
 	def heartbeat(self):
 		dat = {
+			"cmd":"heatbeat",
 			"nodeid":self.config.nodeid,
 			"publickey":self.cpd.public_key,
 			"innerinfo":(self.local_ip,self.config.port),
