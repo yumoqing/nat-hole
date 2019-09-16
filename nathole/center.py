@@ -1,6 +1,10 @@
 # center node 
 import sys
 import asyncio
+try:
+	import ujson as json
+except:
+	import json
 from socket import gethostbyname
 
 from appPublic.uniqueID import getID
