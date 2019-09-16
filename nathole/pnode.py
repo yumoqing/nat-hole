@@ -38,7 +38,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.cpd = NodePeerData(config.nodeid,config.privatekey)
 		self.local_ip = getlocalip()
 		self.commands={
-			"heartbeatresp":self.heartbeat,
+			"heartbeatresp":self.heartbeatresp,
 			"getpeerinforesp":self.getpeerinfo,
 			"forwardmsgresp":self.forwardmsgresp,
 			"a_connect_b":self.a_connect_b,
