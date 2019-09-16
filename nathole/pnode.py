@@ -107,6 +107,8 @@ class NodeProtocol(TextUDPProtocol):
 			"peername":"peername"
 		}
 		"""
+		loop = asyncio.get_event_loop()
+		loop.call_later(60, self.getpeerinfo, peername)
 		d = {
 			"cmd":"getpeerinfo",
 			"peername":peername
@@ -115,8 +117,6 @@ class NodeProtocol(TextUDPProtocol):
 		txt = json.dumps(d)
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)
-		loop = asyncio.get_event_loop()
-		loop.call_later(60, self.getpeerinfo,peername)
 
 	def atSameNAT(self,addr):
 		ips = addr[0].split('.')
