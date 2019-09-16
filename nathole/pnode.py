@@ -121,7 +121,7 @@ class NodeProtocol(TextUDPProtocol):
 
 	def isSameNAT(self,addr):
 		ips = addr[0].split('.')
-		myips = self.inner_ip.split('.')
+		myips = self.local_ip.split('.')
 		if ips[:3] == myips[:3] and ips[3] != myips[3]:
 			return True
 		return False
