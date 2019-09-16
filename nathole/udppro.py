@@ -71,7 +71,7 @@ class PeerData:
 		cryptedkey,sign,cryptedText = body.split('|@|')
 		key = self.rsa.decode(self.private_key,cryptedkey)
 		text = rc4.decode(cryptText,key)
-		spubk = self.getPeerPublickey(sender)
+		spubk = self.rsa.publickeyFromText(self.getPeerPublickey(sender))
 		r = self.rsa.check_sign(spubk,text,sign)
 		if not r:
 			return None
@@ -86,7 +86,7 @@ class PeerData:
 			arr = [crypted,'0',self.myname,receiver,text]
 			return '|+|'.join(arr)
 		
-		rpubk = self.getPeerPublickey(receiver)
+		rpubk = self.rsa.publickeyFromText(self.getPeerPublickey(receiver))
 		key = getID()
 		ctext = self.rc4.encode(text,key)
 		sign = self.rsa.sign(self.private_key,text)

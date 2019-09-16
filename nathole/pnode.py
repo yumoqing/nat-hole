@@ -75,7 +75,7 @@ class NodeProtocol(TextUDPProtocol):
 		dat = {
 			"cmd":"heatbeat",
 			"nodeid":self.config.nodeid,
-			"publickey":self.cpd.public_key,
+			"publickey":self.rsaobj.publickeyText(self.cpd.public_key),
 			"innerinfo":(self.local_ip,self.config.port),
                 }
 		print('heartbeat=',dat,self.config.nodeid)
