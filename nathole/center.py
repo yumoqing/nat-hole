@@ -13,6 +13,7 @@ from udppro import serverFactory,TextUDPProtocol, PeerData
 
 class CenterPeerData(PeerData):
 	def getPeerPublickey(self,peername):
+		return self.nodeinfo[peername].public_key
 		config = getConfig()
 		if config.publickeys:
 			return config.publickeys.get(peername)
@@ -33,6 +34,7 @@ class CenterProtocol(TextUDPProtocol):
 		}
 
 	def on_recv(self,data,addr):
+		print(self.config.nodeid,'on_recv()', addr)
 		d = self.cpd.getReceivedData(data,addr)
 		data = json.loads(d.data)
 		data = DictObject(data)

@@ -4,7 +4,7 @@ import sys
 import asyncio
 from socket import gethostbyname
 
-from appPublic.uniqueID import getId
+from appPublic.uniqueID import getID
 from appPublic.jsonConfig import getConfig
 from appPublic.rsa import RSA
 from appPublic.dictObject import DictObject
@@ -27,16 +27,16 @@ class NodeProtocol(TextUDPProtocol):
 	def __init__(self):
 		self.config = getConfig()
 		self.rsaobj = RSA()
-		self.center_addr = gethostbyname(self.config.center), 
+		self.center_addr = gethostbyname(self.config.center), \
 					self.config.port
 		self.direct_addrs = {}
 
-		self.cpd = CenterPeerData(config.nodeid,config.privatekey)
+		self.cpd = NodePeerData(config.nodeid,config.privatekey)
 		self.local_ip = getlocalip()
 		self.commands={
 			"heartbeatresp":self.heartbeat,
 			"getpeerinforesp":self.getpeerinfo,
-			"forwardmsgresp":"self.forwardmsg,
+			"forwardmsgresp":self.forwardmsgresp,
 			"a_connect_b":self.a_connect_b,
 			"b_connect_a":self.b_connect_a,
 		}
@@ -56,7 +56,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.direct_addrs[d.sender] = d.sender_addr
 
 	def a_connect_b(self,d):
-		print('a_connect_b',d):
+		print('a_connect_b',d)
 		self.direct_Addrs[d.sender] = d.sender_addr
 		
 	def onlinelist(self):
@@ -129,7 +129,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.cpd.publickeys[d.peername] = rpubk
 		internet_addr = d.internetinfo
 		retdata = {
-			"cmd":"a_connect_b"
+			"cmd":"a_connect_b",
 			"peername":d.peername,
 			"to_addr":d.internetinfo,
 			"from_addr":self.internetinfo
@@ -167,6 +167,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.send(msg,d.forwarddata.internetinfo)
 
 if __name__ == '__main__':
+	from appPublic.folderUtils import ProgramPath
 	name = None
 	pp = ProgramPath()
 	workdir = pp
