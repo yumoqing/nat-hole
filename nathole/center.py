@@ -114,6 +114,7 @@ class CenterProtocol(TextUDPProtocol):
 			}
 		else:
 			retdata.update(nodeinfo)
+			retdata['cmd'] = 'getpeerinforesp'
 		text = json.dumps(retdata)
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.sender_addr)
