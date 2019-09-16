@@ -136,7 +136,7 @@ class NodeProtocol(TextUDPProtocol):
 			"innerinfo":addr1
 		}
 		"""
-		# print(self.config.nodeid,'getpeeriforesp(),d=',d)
+		print(self.config.nodeid,'getpeeriforesp(),d=',d)
 		rpubk = d.publickey
 		self.cpd.publickeys[d.peername] = rpubk
 		retdata = {
@@ -160,8 +160,9 @@ class NodeProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		# print(self.config.nodeid,'forwardmsg(),d=',d)
-		if d.forwardto[0] != self.config.nodeid:
+		print(self.config.nodeid,'forwardmsg(),d=',d)
+		if d.forwardto != self.config.nodeid:
+			print(self.config.nodeid,'forwardto is not me',d.forwardto)
 			return
 
 		if d.forwardfrom != d.forwarddata.nodeid:
