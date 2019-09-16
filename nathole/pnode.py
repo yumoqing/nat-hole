@@ -85,7 +85,7 @@ class NodeProtocol(TextUDPProtocol):
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)
 		loop = asyncio.get_event_loop()
-		loop.call_later(self.config.heartbeat_timeout,self.heartbeat)
+		loop.call_later(self.config.heartbeat_timeout or 30,self.heartbeat)
 
 	def heartbeatresp(self,d):
 		print('heartbeatresp',d)
