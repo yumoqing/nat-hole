@@ -68,8 +68,9 @@ class CenterProtocol(TextUDPProtocol):
 		}
 		"""
 		print(self.config.nodeid,'heartbeat(),d=',d)
-		d.nodeinfo.internetinfo = d.sender_addr
-		self.nodeinfo[d.nodeid] = d.nodeinfo
+		d.internetinfo = d.sender_addr
+		del d['cmd']
+		self.nodeinfo[d.nodeid] = d
 		retdata = {
 			"cmd":"heartbeatresp",
 			"internetinfo":d.sender_addr
