@@ -41,7 +41,7 @@ class NodeProtocol(TextUDPProtocol):
 			"greeting":self.greeting,
 			"heartbeatresp":self.heartbeatresp,
 			"getpeerinforesp":self.getpeerinforesp,
-			"forwardmsgresp":self.forwardmsgresp,
+			"forwardmsg":self.forwardmsg,
 			"a_connect_b":self.a_connect_b,
 			"b_connect_a":self.b_connect_a,
 		}
@@ -149,17 +149,17 @@ class NodeProtocol(TextUDPProtocol):
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.internetinfo)
 
-	def forwardmsgresp(self,d):
+	def forwardmsg(self,d):
 		"""
 		{
-			"cmd":"forwardmsgresp",
+			"cmd":"forwardmsg",
 			"forwardfrom":"xxx",
 			"forwardto":peername,
 			"forwarddata":{
 			}
 		}
 		"""
-		print(self.config.nodeid,'forwardmsgresp(),d=',d)
+		print(self.config.nodeid,'forwardmsg(),d=',d)
 		if d.forwardto[0] != self.config.nodeid:
 			return
 
