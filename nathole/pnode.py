@@ -175,7 +175,7 @@ class NodeProtocol(TextUDPProtocol):
 		}
 		txt = json.dumps(b2a)
 		msg = self.cpd.setSendData(d.forwardfrom, json.dumps(d)) 
-		if self.isSameNAT(forwarddata.innerinfo):
+		if self.isSameNAT(d.forwarddata.innerinfo):
 			self.send(msg, d.forwarddata.innerinfo)
 		print(self.config.nodeid,'send to peer ', d.forwardfrom,d.forwarddata.internetinfo)
 		self.send(msg,tuple(d.forwarddata.internetinfo))
