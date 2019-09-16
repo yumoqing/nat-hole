@@ -55,7 +55,7 @@ class CenterProtocol(TextUDPProtocol):
 		}
 		
 		text = json.dumps(resp)
-		msg, addr = self.cpd.setSendData(d.sender,text)
+		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg, d.sender_addr)
 
 	def heartbeat(self,d):
@@ -76,7 +76,7 @@ class CenterProtocol(TextUDPProtocol):
 			"internetinfo":d.sender_addr
 		}
 		text = json.dumps(retdata)
-		msg, addr = self.cpd.setSendData(d.sender,text)
+		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.sender_addr)
 
 	def getpeerinfo(self,d):
@@ -114,7 +114,7 @@ class CenterProtocol(TextUDPProtocol):
 		else:
 			retdata.update(nodeinfo)
 		text = json.dumps(retdata)
-		msg, addr = self.cpd.setSendData(d.sender,text)
+		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.sender_addr)
 		forward = {
 			"cmd":"forwardmsg",

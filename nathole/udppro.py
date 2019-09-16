@@ -86,7 +86,7 @@ class PeerData:
 		sign = self.rsa.sign(self.private_key,text)
 		cryptedkey = self.rsa.encode(rpubk,key)
 		arr = [cryptedkey,sign,ctext ]
-		return '|@|'.join(arr),self.getPeerAddr(receiver)
+		return '|@|'.join(arr)
 
 class TextUDPProtocol:
 	def connection_made(self,transport):

@@ -68,7 +68,7 @@ class NodeProtocol(TextUDPProtocol):
 			"cmd":"onlinelist"
 		}
 		text = json.dumps(req)
-		msg, addr = self.cpd.setSendData(self.config.center,text)
+		msg = self.cpd.setSendData(self.config.center,text)
 		self.send(msg, self.center_addr)
 
 	def onlinelistresp(self, d):
@@ -82,7 +82,7 @@ class NodeProtocol(TextUDPProtocol):
                 }
 		print('heartbeat=',dat,self.config.nodeid)
 		txt = json.dumps(dat)
-		msg, addr = self.cpd.setSendData(self.config.center,txt)
+		msg = self.cpd.setSendData(self.config.center,txt)
 		if addr is None:
 			return 
 		self.send(msg,addr)
@@ -106,7 +106,7 @@ class NodeProtocol(TextUDPProtocol):
 		}
 		print('getpeerinfo',d)
 		txt = json.dumps(d)
-		msg, addr = self.cpd.setSendData(self.config.center,txt)
+		msg = self.cpd.setSendData(self.config.center,txt)
 		if addr is None:
 			return 
 		self.send(msg,addr)
@@ -139,7 +139,7 @@ class NodeProtocol(TextUDPProtocol):
 			"from_addr":self.internetinfo
 		}
 		text = json.dumps(retdata)
-		msg, addr = self.cpd.setSendData(d.sender,text)
+		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.internetinfo)
 
 	def forwardmsgresp(self,d):
@@ -165,7 +165,7 @@ class NodeProtocol(TextUDPProtocol):
 			"received_id":d.forwardfrom,
 		}
 		txt = json.dumps(b2a)
-		msg, addr = self.cpd.setSendData(d.forwardfrom, json.dumps(d)) 
+		msg = self.cpd.setSendData(d.forwardfrom, json.dumps(d)) 
 		if isSameNAT(forwarddata.innerinfo):
 			self.send(msg, d.forwarddata.innerinfo)
 		self.send(msg,d.forwarddata.internetinfo)
