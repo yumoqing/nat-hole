@@ -40,7 +40,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.commands={
 			"greeting":self.greeting,
 			"heartbeatresp":self.heartbeatresp,
-			"getpeerinforesp":self.getpeerinfo,
+			"getpeerinforesp":self.getpeerinforesp,
 			"forwardmsgresp":self.forwardmsgresp,
 			"a_connect_b":self.a_connect_b,
 			"b_connect_a":self.b_connect_a,
@@ -50,6 +50,7 @@ class NodeProtocol(TextUDPProtocol):
 		data = self.cpd.getReceivedData(data,addr)
 		func = self.commands.get(data.cmd)
 		if func == None:
+			print(self.config.nodeid,data.cmd,' not defined')
 			return
 		return func(data)
 
