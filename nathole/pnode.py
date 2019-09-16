@@ -46,10 +46,7 @@ class NodeProtocol(TextUDPProtocol):
 		}
 	
 	def on_recv(self,data,addr):
-		d = self.cpd.getReceivedData(data,addr)
-		data = json.loads(d.data)
-		data = DictObject(data)
-		data.sender_addr = addr
+		data = self.cpd.getReceivedData(data,addr)
 		func = self.commands.get(data.cmd)
 		if func == None:
 			return

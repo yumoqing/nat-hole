@@ -39,10 +39,8 @@ class CenterProtocol(TextUDPProtocol):
 
 	def on_recv(self,data,addr):
 		print(self.config.nodeid,'on_recv()', addr)
-		d = self.cpd.getReceivedData(data,addr)
-		data = json.loads(d.data)
-		data = DictObject(data)
-		data.sender_attr = addr
+		data = self.cpd.getReceivedData(data,addr)
+		print(self.nodeid,'on_recv():d=',data)
 		func = self.commands.get(data.cmd)
 		if func == None:
 			return

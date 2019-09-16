@@ -59,7 +59,11 @@ class PeerData:
 			return None
 		self.setPeerAddr(sender,addr)
 		if crypted == '0':
-			return body
+			d = json.loads(body)
+			d['sender'] = sender
+			d['receiver'] = receiver
+			d['sender_addr'] = addr
+			return DictObject(**d)
 		cryptedkey,sign,cryptedText = body.split('|@|')
 		key = self.rsa.decode(self.private_key,cryptedkey)
 		text = rc4.decode(cryptText,key)
@@ -67,13 +71,11 @@ class PeerData:
 		r = self.rsa.check_sign(spubk,text,sign)
 		if not r:
 			return None
-		return DictObject(**{
-			"sender":sender,
-			"receiver":receiver,
-			"sender_host":addr[0],
-			"sender_port":addr[1],
-			"data":text
-		})
+		d = json.loads(text)
+		d['sender'] = sender
+		d['receiver'] = receiver
+		d['sender_addr'] = addr
+		return DictObject(**d)
 
 	def setSendData(self,receiver,text,crypted='0',zipped='0'):
 		if crypted == '0':
