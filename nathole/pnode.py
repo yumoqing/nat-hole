@@ -83,8 +83,6 @@ class NodeProtocol(TextUDPProtocol):
 		print('heartbeat=',dat,self.config.nodeid)
 		txt = json.dumps(dat)
 		msg = self.cpd.setSendData(self.config.center,txt)
-		if addr is None:
-			return 
 		self.send(msg,addr)
 		loop = asyncio.get_event_loop()
 		loop.call_later(self.config.heartbeat_timeout,self.heartbeat)
@@ -107,8 +105,6 @@ class NodeProtocol(TextUDPProtocol):
 		print('getpeerinfo',d)
 		txt = json.dumps(d)
 		msg = self.cpd.setSendData(self.config.center,txt)
-		if addr is None:
-			return 
 		self.send(msg,addr)
 
 	def atSameNAT(self,addr):
