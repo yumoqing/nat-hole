@@ -50,7 +50,7 @@ class NodeProtocol(TextUDPProtocol):
 		data = self.cpd.getReceivedData(data,addr)
 		func = self.commands.get(data.cmd)
 		if func == None:
-			print(self.config.nodeid,data.cmd,' not defined')
+			print(self.config.nodeid,data.cmd,' not defined',data,type(data.cmd))
 			return
 		return func(data)
 
@@ -109,7 +109,7 @@ class NodeProtocol(TextUDPProtocol):
 		}
 		"""
 		loop = asyncio.get_event_loop()
-		loop.call_later(60, self.getpeerinfo, peername)
+		loop.call_later(15, self.getpeerinfo, peername)
 		d = {
 			"cmd":"getpeerinfo",
 			"peername":peername
@@ -190,5 +190,5 @@ if __name__ == '__main__':
 	server = serverFactory(NodeProtocol,'0.0.0.0',config.port)
 	server.heartbeat()
 	if len(sys.argv) > 2:
-		loop.call_later(60,server.getpeerinfo, sys.argv[2])
+		loop.call_later(15,server.getpeerinfo, sys.argv[2])
 	loop.run_forever()
