@@ -16,6 +16,10 @@ sprik:sender's private key
 
 """
 import asyncio
+try:
+	import ujson as json
+except:
+	import json
 
 import socket
 
