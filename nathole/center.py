@@ -39,7 +39,7 @@ class CenterProtocol(TextUDPProtocol):
 
 	def on_recv(self,data,addr):
 		data = self.cpd.getReceivedData(data,addr)
-		print(self.config.nodeid,'on_recv():d=',data,addr)
+		# print(self.config.nodeid,'on_recv():d=',data,addr)
 		func = self.commands.get(data.cmd)
 		if func == None:
 			print(self.config.nodeid,data.cmd,'command not defined')
@@ -118,6 +118,8 @@ class CenterProtocol(TextUDPProtocol):
 		text = json.dumps(retdata)
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.sender_addr)
+		if nodeinfo is None:
+			return 
 		forward = {
 			"cmd":"forwardmsg",
 			"forwardfrom":d.sender,
