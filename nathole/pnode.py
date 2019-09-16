@@ -131,12 +131,12 @@ class NodeProtocol(TextUDPProtocol):
 		{
 			"cmd":"getpeerinforesp"
 			"publickey":rpubk,
-			"peername":d.peername,
+			"peername":d.nodeid,
 			"internetinfo":addr,
 			"innerinfo":addr1
 		}
 		"""
-		print(self.config.nodeid,'getpeeriforesp(),d=',d)
+		# print(self.config.nodeid,'getpeeriforesp(),d=',d)
 		rpubk = d.publickey
 		self.cpd.publickeys[d.peername] = rpubk
 		retdata = {
@@ -146,8 +146,9 @@ class NodeProtocol(TextUDPProtocol):
 			"from_addr":self.internet_addr
 		}
 		text = json.dumps(retdata)
-		msg = self.cpd.setSendData(d.sender,text)
-		self.send(msg,d.internetinfo)
+		print(self.config.nodeid,'send msg to', d.nodeid,d.internetinfo) 
+		msg = self.cpd.setSendData(d.nodeid,text)
+		self.send(msg,tuple(d.internetinfo))
 
 	def forwardmsg(self,d):
 		"""
@@ -159,7 +160,7 @@ class NodeProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		print(self.config.nodeid,'forwardmsg(),d=',d)
+		# print(self.config.nodeid,'forwardmsg(),d=',d)
 		if d.forwardto[0] != self.config.nodeid:
 			return
 
@@ -175,7 +176,8 @@ class NodeProtocol(TextUDPProtocol):
 		msg = self.cpd.setSendData(d.forwardfrom, json.dumps(d)) 
 		if isSameNAT(forwarddata.innerinfo):
 			self.send(msg, d.forwarddata.innerinfo)
-		self.send(msg,d.forwarddata.internetinfo)
+		print(self.config.nodeid,'send to peer ', d.forwardfrom,d.forwarddata.internetinfo)
+		self.send(msg,tuple(d.forwarddata.internetinfo))
 
 if __name__ == '__main__':
 	from appPublic.folderUtils import ProgramPath
@@ -190,5 +192,5 @@ if __name__ == '__main__':
 	server = serverFactory(NodeProtocol,'0.0.0.0',config.port)
 	server.heartbeat()
 	if len(sys.argv) > 2:
-		loop.call_later(15,server.getpeerinfo, sys.argv[2])
+		loop.call_later(30,server.getpeerinfo, sys.argv[2])
 	loop.run_forever()
