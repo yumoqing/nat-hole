@@ -86,7 +86,7 @@ class NodeProtocol(TextUDPProtocol):
 		loop.call_later(self.config.heartbeat_timeout or 30,self.heartbeat)
 
 	def heartbeatresp(self,d):
-		print('heartbeatresp',d)
+		print(self.config.nodeid,'heartbeatresp(),d=',d)
 		self.internet_addr = d.internetinfo
 
 	def getpeerinfo(self,peername):
@@ -100,7 +100,7 @@ class NodeProtocol(TextUDPProtocol):
 			"cmd":"getpeerinfo",
 			"peername":peername
 		}
-		print('getpeerinfo',d)
+		print(self.config.nodeid,'getpeerinfo(),d=',d)
 		txt = json.dumps(d)
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)

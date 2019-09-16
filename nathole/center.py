@@ -42,6 +42,7 @@ class CenterProtocol(TextUDPProtocol):
 		print(self.config.nodeid,'on_recv():d=',data,addr)
 		func = self.commands.get(data.cmd)
 		if func == None:
+			print(self.config.nodeid,data.cmd,'command not defined')
 			return
 		return func(data)
 
@@ -66,6 +67,7 @@ class CenterProtocol(TextUDPProtocol):
 			}
 		}
 		"""
+		print(self.config.nodeid,'heartbeat(),d=',d)
 		d.nodeinfo.internetinfo = d.sender_addr
 		self.nodeinfo[d.nodeid] = d.nodeinfo
 		retdata = {
@@ -98,6 +100,8 @@ class CenterProtocol(TextUDPProtocol):
                 }
 
 		"""
+		print(self.config.nodeid,'getpeerinfo(),d=',d,'nodeinfo=',
+				self.nodeinfo)
 		nodeinfo = self.nodeinfo.get(d.peername)
 		retdata = {}
 		if nodeinfo is None:
