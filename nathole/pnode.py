@@ -119,7 +119,7 @@ class NodeProtocol(TextUDPProtocol):
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)
 
-	def atSameNAT(self,addr):
+	def isSameNAT(self,addr):
 		ips = addr[0].split('.')
 		myips = self.inner_ip.split('.')
 		if ips[:3] == myips[:3] and ips[3] != myips[3]:
