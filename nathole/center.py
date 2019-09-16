@@ -67,7 +67,7 @@ class CenterProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		print(self.config.nodeid,'heartbeat(),d=',d)
+		# print(self.config.nodeid,'heartbeat(),d=',d)
 		d.internetinfo = d.sender_addr
 		del d['cmd']
 		self.nodeinfo[d.nodeid] = d
