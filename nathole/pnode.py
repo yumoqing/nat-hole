@@ -19,8 +19,7 @@ from udppro import serverFactory,TextUDPProtocol, PeerData, getlocalip
 class NodePeerData(PeerData):
 	def getPeerPublickey(self,peername):
 		pk = self.publickeys.get(peername)
-		if pk is None:
-			return None
+		return pk
 		config = getConfig()
 		if config.publickeys:
 			return config.publickeys.get(peername)
@@ -36,6 +35,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.direct_addrs = {}
 
 		self.cpd = NodePeerData(config.nodeid,config.privatekey)
+		self.cpd.publickeys = {}
 		self.local_ip = getlocalip()
 		self.commands={
 			"greeting":self.greeting,
