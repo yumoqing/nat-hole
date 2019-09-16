@@ -74,7 +74,7 @@ class NodeProtocol(TextUDPProtocol):
 	def onlinelistresp(self, d):
 		self.onlines = d.onlinelist
 
-	def heartbeat(self,d):
+	def heartbeat(self):
 		dat = {
 			"nodeid":self.config.nodeid,
 			"publickey":self.cpd.public_key,
