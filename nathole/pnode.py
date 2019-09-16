@@ -61,7 +61,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.direct_addrs[d.sender] = d.sender_addr
 		d = {
 			"cmd":"greeting",
-			"msg":"Hello peer ' + d.sender
+			"msg":"Hello peer " + d.sender
 		}
 		text = json.dumps(d)
 		msg = self.cpd.setSendData(d.sender,text)
