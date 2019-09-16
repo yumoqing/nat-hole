@@ -89,7 +89,7 @@ class NodeProtocol(TextUDPProtocol):
 			"publickey":self.rsaobj.publickeyText(self.cpd.public_key),
 			"innerinfo":(self.local_ip,self.config.port),
                 }
-		print('heartbeat=',dat,self.config.nodeid)
+		# print('heartbeat=',dat,self.config.nodeid)
 		txt = json.dumps(dat)
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)

@@ -113,7 +113,7 @@ class TextUDPProtocol:
 			config.port))
 	"""
 	def datagram_received(self,data,addr):
-		print('datagram_received',data,addr)
+		# print('datagram_received',data,addr)
 		message = data.decode(self.coding)
 		self.on_recv(message,addr)	
 
