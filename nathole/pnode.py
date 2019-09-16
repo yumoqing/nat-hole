@@ -177,6 +177,7 @@ if __name__ == '__main__':
 	config = getConfig(workdir,NS={'workdir':workdir,'ProgramPath':pp})
 	loop = asyncio.get_event_loop()
 	server = serverFactory(NodeProtocol,'0.0.0.0',config.port)
+	server.heartbeat()
 	if len(sys.argv) > 2:
 		loop.call_later(60,server.getpeerinfo, sys.argv[2])
 	loop.run_forever()
