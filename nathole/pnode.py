@@ -27,10 +27,8 @@ class NodePeerData(PeerData):
 
 
 class NodeProtocol(TextUDPProtocol):
-	def __init__(self,loop=None):
+	def __init__(self):
 		self.config = getConfig()
-		if loop is None
-			self.loop = asyncio.get_event_loop()
 		self.peertasks = {}
 		self.rsaobj = RSA()
 		self.center_addr = gethostbyname(self.config.center), \
@@ -58,12 +56,13 @@ class NodeProtocol(TextUDPProtocol):
 
 	def greeting(self,d):
 		print(self.config.nodeid,'greeting(),d=',d)
+		self.peertasks[d.sender].cancel()
 		d.cnt = d.cnt + 1
 		if d.cnt > 1:
 			return 
-		f = d.from
-		d.from = d.to
-		d.o = f
+		f = d.fromnode
+		d.fromnode = d.tonode
+		d.tonode = f
 		addr = d.sender_addr
 		reciever = d.sender
 		del d['sender']
@@ -72,17 +71,15 @@ class NodeProtocol(TextUDPProtocol):
 		msg = self.cpd.setSendData(receiver,text)
 		self.send(msg, addr)
 		
-	def make_peer_connect(self,peerdata):
-
 	def peer_connect(self,d):
 		print(self.config.nodeid, 'peer_connect(),d=',d)
 		self.direct_addrs[d.sender] = d.sender_addr
 		d = {
 			"cmd":"greeting",
-			"msg":"Hello peer " + d.sender,
-			"from":self.config.nodeid,
+			"msg":"Hello peer ",
+			"fromnode":self.config.nodeid,
 			"cnt":0,
-			"to":d.sender
+			"tonode":d.sender
 		}
 		text = json.dumps(d)
 		msg = self.cpd.setSendData(d.sender,text)
@@ -110,8 +107,7 @@ class NodeProtocol(TextUDPProtocol):
 		txt = json.dumps(dat)
 		msg = self.cpd.setSendData(self.config.center,txt)
 		self.send(msg,self.center_addr)
-		loop = asyncio.get_event_loop()
-		loop.call_later(self.config.heartbeat_timeout or 30,self.heartbeat)
+		self.loop.call_later(self.config.heartbeat_timeout or 30,self.heartbeat)
 
 	def heartbeatresp(self,d):
 		print(self.config.nodeid,'heartbeatresp(),d=',d)
@@ -124,8 +120,7 @@ class NodeProtocol(TextUDPProtocol):
 			"peername":"peername"
 		}
 		"""
-		loop = asyncio.get_event_loop()
-		loop.call_later(15, self.getpeerinfo, peername)
+		self.loop.call_later(15, self.getpeerinfo, peername)
 		d = {
 			"cmd":"getpeerinfo",
 			"peername":peername
@@ -190,7 +185,7 @@ class NodeProtocol(TextUDPProtocol):
 
 		b2a = {
 			"cmd":"peer_connect",
-			"to_addr":d.forwarddata.internetinfo
+			"to_addr":d.forwarddata.internetinfo,
 			"from_addr":self.internet_addr
 		}
 		txt = json.dumps(b2a)

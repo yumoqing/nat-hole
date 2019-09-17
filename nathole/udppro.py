@@ -154,7 +154,7 @@ def serverFactory(Klass, host,port,loop=None,coding='utf-8'):
 		Klass, local_addr=(host,port))
 	transport,server = loop.run_until_complete(listen)
 	server.coding = coding
-	server._loop = loop
+	server.loop = loop
 	server.port = port
 	return server
 	
