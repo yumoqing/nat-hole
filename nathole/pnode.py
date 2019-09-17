@@ -110,7 +110,13 @@ class NodeProtocol(TextUDPProtocol):
 		self.loop.call_later(self.config.heartbeat_timeout or 30,self.heartbeat)
 
 	def heartbeatresp(self,d):
-		print(self.config.nodeid,'heartbeatresp(),d=',d)
+		"""
+		{
+			"cmd":"heartbeatresp",
+			"internetinfo":d.sender_addr
+		}
+		"""
+		print(self.config.nodeid,'heartbeatresp(),d=',d.internetinfo)
 		self.internet_addr = d.internetinfo
 
 	def getpeerinfo(self,peername):
