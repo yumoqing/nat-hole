@@ -162,9 +162,10 @@ class NodeProtocol(TextUDPProtocol):
 
 	def try_connect(self, msg, addr, peername):
 		print(self.config.nodeid,'try connect to',peername,addr)
-		task = self.loop.call_later(0.5,self.try_connect,msg,addr)
+		task = self.loop.call_later(0.5,self.try_connect,
+			msg,addr,peername)
 		self.peertasks[peername] = task
-		self.send(msg,addr,peername)
+		self.send(msg,addr)
 
 	def forwardmsg(self,d):
 		"""
