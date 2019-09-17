@@ -119,7 +119,7 @@ class CenterProtocol(TextUDPProtocol):
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg,d.sender_addr)
 		if nodeinfo is None:
-			printf(self.config.nodeid,'getpeerinfo(),nodeinfo is none for', d.peername)
+			print(self.config.nodeid,'getpeerinfo(),nodeinfo is none for', d.peername)
 			return 
 		forward = {
 			"cmd":"forwardmsg",
