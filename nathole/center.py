@@ -129,7 +129,7 @@ class CenterProtocol(TextUDPProtocol):
 		}
 		text = json.dumps(forward)
 		msg = self.cpd.setSendData(d.peername,text)
-		self.send(msg,nodeinfo.internetinfo)
+		self.send(msg,tuple(nodeinfo.internetinfo))
 
 if __name__ == '__main__':
 	from appPublic.folderUtils import ProgramPath

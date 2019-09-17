@@ -27,8 +27,11 @@ class NodePeerData(PeerData):
 
 
 class NodeProtocol(TextUDPProtocol):
-	def __init__(self):
+	def __init__(self,loop=None):
 		self.config = getConfig()
+		if loop is None
+			self.loop = asyncio.get_event_loop()
+		self.peertasks = {}
 		self.rsaobj = RSA()
 		self.center_addr = gethostbyname(self.config.center), \
 					self.config.port
@@ -42,8 +45,7 @@ class NodeProtocol(TextUDPProtocol):
 			"heartbeatresp":self.heartbeatresp,
 			"getpeerinforesp":self.getpeerinforesp,
 			"forwardmsg":self.forwardmsg,
-			"a_connect_b":self.a_connect_b,
-			"b_connect_a":self.b_connect_a,
+			"peer_connect":self.peer_connect,
 		}
 	
 	def on_recv(self,data,addr):
@@ -56,22 +58,36 @@ class NodeProtocol(TextUDPProtocol):
 
 	def greeting(self,d):
 		print(self.config.nodeid,'greeting(),d=',d)
+		d.cnt = d.cnt + 1
+		if d.cnt > 1:
+			return 
+		f = d.from
+		d.from = d.to
+		d.o = f
+		addr = d.sender_addr
+		reciever = d.sender
+		del d['sender']
+		del d['receiver']
+		text = json.dumps(d)
+		msg = self.cpd.setSendData(receiver,text)
+		self.send(msg, addr)
 		
-	def b_connect_a(self,d):
-		print(self.config.nodeid, 'b_connect_a(),d=',d)
+	def make_peer_connect(self,peerdata):
+
+	def peer_connect(self,d):
+		print(self.config.nodeid, 'peer_connect(),d=',d)
 		self.direct_addrs[d.sender] = d.sender_addr
 		d = {
 			"cmd":"greeting",
-			"msg":"Hello peer " + d.sender
+			"msg":"Hello peer " + d.sender,
+			"from":self.config.nodeid,
+			"cnt":0,
+			"to":d.sender
 		}
 		text = json.dumps(d)
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg, d.sender_addr)
 
-	def a_connect_b(self,d):
-		print('a_connect_b',d)
-		self.direct_Addrs[d.sender] = d.sender_addr
-		
 	def onlinelist(self):
 		req = {
 			"cmd":"onlinelist"
@@ -98,7 +114,7 @@ class NodeProtocol(TextUDPProtocol):
 		loop.call_later(self.config.heartbeat_timeout or 30,self.heartbeat)
 
 	def heartbeatresp(self,d):
-		# print(self.config.nodeid,'heartbeatresp(),d=',d)
+		print(self.config.nodeid,'heartbeatresp(),d=',d)
 		self.internet_addr = d.internetinfo
 
 	def getpeerinfo(self,peername):
@@ -140,15 +156,19 @@ class NodeProtocol(TextUDPProtocol):
 		rpubk = d.publickey
 		self.cpd.publickeys[d.peername] = rpubk
 		retdata = {
-			"cmd":"a_connect_b",
-			"peername":d.peername,
+			"cmd":"peer_connect",
 			"to_addr":d.internetinfo,
 			"from_addr":self.internet_addr
 		}
 		text = json.dumps(retdata)
-		print(self.config.nodeid,'send msg to', d.nodeid,d.internetinfo) 
 		msg = self.cpd.setSendData(d.nodeid,text)
-		self.send(msg,tuple(d.internetinfo))
+		addr = tuple(d.internetinfo)
+		self.try_connect(msg,addr,d.nodeid)
+
+	def try_connect(self, msg,addr,peername):
+		task = self.loop.call_later(0.5,self.try_connect,msg,addr)
+		self.peertask[peername] = task
+		self.send(msg,addr)
 
 	def forwardmsg(self,d):
 		"""
@@ -169,16 +189,14 @@ class NodeProtocol(TextUDPProtocol):
 			return
 
 		b2a = {
-			"cmd":"b_connect_a",
-			"sender_id":self.config.nodeid,
-			"received_id":d.forwardfrom,
+			"cmd":"peer_connect",
+			"to_addr":d.forwarddata.internetinfo
+			"from_addr":self.internet_addr
 		}
 		txt = json.dumps(b2a)
 		msg = self.cpd.setSendData(d.forwardfrom, json.dumps(d)) 
-		if self.isSameNAT(d.forwarddata.innerinfo):
-			self.send(msg, d.forwarddata.innerinfo)
-		print(self.config.nodeid,'send to peer ', d.forwardfrom,d.forwarddata.internetinfo)
-		self.send(msg,tuple(d.forwarddata.internetinfo))
+		addr = tuple(d.forwarddata.internetinfo)
+		self.try_connect(msg,addr,d.forwardfrom)
 
 if __name__ == '__main__':
 	from appPublic.folderUtils import ProgramPath
