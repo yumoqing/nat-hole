@@ -147,7 +147,7 @@ class NodeProtocol(TextUDPProtocol):
 			"innerinfo":addr1
 		}
 		"""
-		print(self.config.nodeid,'getpeeriforesp(),d=',d)
+		print(self.config.nodeid,'getpeeriforesp(),d=',d.internetinfo)
 		rpubk = d.publickey
 		self.cpd.publickeys[d.peername] = rpubk
 		retdata = {
@@ -161,6 +161,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.try_connect(msg,addr,d.nodeid)
 
 	def try_connect(self, msg,addr,peername):
+		print(self.config.nodeid,'try connect to',peername,addr)
 		task = self.loop.call_later(0.5,self.try_connect,msg,addr)
 		self.peertask[peername] = task
 		self.send(msg,addr)
@@ -175,7 +176,7 @@ class NodeProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		print(self.config.nodeid,'forwardmsg(),d=',d)
+		print(self.config.nodeid,'forwardmsg(),d=',d.forwarddata.nodeid,d.forwarddata.internetinfo)
 		if d.forwardto != self.config.nodeid:
 			print(self.config.nodeid,'forwardto is not me',d.forwardto)
 			return
