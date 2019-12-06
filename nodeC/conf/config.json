@@ -1,0 +1,8 @@
+{
+	"center":"bsppo.com",
+	"nodeid":"nodeC",
+	"iscenter":false,
+	"port":5678,
+	"privatekey":"$[workdir]$/conf/nodeC.pem"
+}
+
