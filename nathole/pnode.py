@@ -30,6 +30,7 @@ class NodeProtocol(TextUDPProtocol):
 	def __init__(self):
 		self.config = getConfig()
 		self.peertasks = {}
+		self.peertasks_cnt = {}
 		self.peerInternetAddrs = {}
 		self.peerInnerAddrs = {}
 		self.rsaobj = RSA()
@@ -177,13 +178,19 @@ class NodeProtocol(TextUDPProtocol):
 		print('will send data=',text)
 		msg = self.cpd.setSendData(peer,text)
 		addr = tuple(self.peerInternetAddrs[peer])
+		self.peertasks_cnt[peername] = 0
 		self.try_connect(msg,addr,peer)
 		
 	def try_connect(self, msg, addr, peername):
 		print(self.config.nodeid,'try connect to',peername,addr)
+		if self.peertasks_cnt[peername] > 12:
+			print('too much try for punching')
+			self.peertasks[peername] = None
+			return
 		task = self.loop.call_later(0.5,self.try_connect,
 			msg,addr,peername)
 		self.peertasks[peername] = task
+		self.peertasks_cnt[peername] += 1
 		self.send(msg,addr)
 
 	def forwardmsg(self,d):
