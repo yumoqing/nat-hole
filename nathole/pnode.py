@@ -161,7 +161,7 @@ class NodeProtocol(TextUDPProtocol):
 		retdata = {
 			"cmd":"peer_connect",
 			"peer":peer,
-			"to_addr":self.peerInternetAddr[peer]
+			"to_addr":self.peerInternetAddr[peer],
 			"from_addr":self.internet_addr
 		}
 		text = json.dumps(retdata)
