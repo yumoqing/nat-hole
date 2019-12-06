@@ -178,7 +178,7 @@ class NodeProtocol(TextUDPProtocol):
 		print('will send data=',text)
 		msg = self.cpd.setSendData(peer,text)
 		addr = tuple(self.peerInternetAddrs[peer])
-		self.peertasks_cnt[peername] = 0
+		self.peertasks_cnt[peer] = 0
 		self.try_connect(msg,addr,peer)
 		
 	def try_connect(self, msg, addr, peername):
