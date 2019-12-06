@@ -204,12 +204,15 @@ class NodeProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		print(self.config.nodeid,'forwardmsg(),d=',d)
+		print(self.config.nodeid,'forwardmsg(),d=',d,
+					d.forwarddata.nodeid,
+					d.forwarddata.internetinfo)
 		if d.forwardto != self.config.nodeid:
 			print(self.config.nodeid,'forwardto is not me',d.forwardto)
 			return
 
-		self.peerInternetAddrs[d.forwarddata.nodeid] = d.forwarddata.interinfo
+		self.peerInternetAddrs[d.forwarddata.nodeid] = \
+					d.forwarddata.internetinfo
 		self.punching(d.forwarddata.nodeid)
 
 if __name__ == '__main__':
