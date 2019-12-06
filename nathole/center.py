@@ -30,6 +30,17 @@ class CenterProtocol(TextUDPProtocol):
 		self.config = getConfig()
 		self.rsaobj = RSA()
 		self.nodeinfo = {}
+		"""
+		nodeinfo 
+		{
+			nodeid:"fff",
+			publickey:"ffkgrjgr",
+			innerinfo:('192.168.1.22',19993),
+			internetinfo:('xxx.xxx.xxx.xxx',22232),
+			service:{
+			}
+		}
+		"""
 		self.cpd = CenterPeerData(config.nodeid,config.privatekey)
 		self.commands={
 			"heartbeat":self.heartbeat,

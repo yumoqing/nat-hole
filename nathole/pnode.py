@@ -188,11 +188,20 @@ class NodeProtocol(TextUDPProtocol):
 
 	def forwardmsg(self,d):
 		"""
-		forward = {
+		d = {
 			"cmd":"forwardmsg",
 			"forwardfrom":d.sender,
 			"forwardto":d.peername,
-			"fromattr":self.nodeinfo.get(d.sender)
+			"forwarddata":self.nodeinfo.get(d.sender)
+		}
+		forwarddata 
+		{
+			nodeid:"fff",
+			publickey:"ffkgrjgr",
+			innerinfo:('192.168.1.22',19993),
+			internetinfo:('xxx.xxx.xxx.xxx',22232),
+			service:{
+			}
 		}
 		"""
 		print(self.config.nodeid,'forwardmsg(),d=',d)
@@ -200,8 +209,8 @@ class NodeProtocol(TextUDPProtocol):
 			print(self.config.nodeid,'forwardto is not me',d.forwardto)
 			return
 
-		self.peerInternetAddrs[d.forwardfrom] = d.fromaddr
-		self.punching(d.forwardfrom)
+		self.peerInternetAddrs[d.forwarddata.nodeid] = d.forwarddata.interinfo
+		self.punching(d.forwarddata.nodeid)
 
 if __name__ == '__main__':
 	from appPublic.folderUtils import ProgramPath
