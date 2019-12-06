@@ -81,6 +81,7 @@ class NodeProtocol(TextUDPProtocol):
 			"cnt":0,
 			"tonode":d.sender
 		}
+		[ t.cancel() for t in self.peertasks]
 		text = json.dumps(d)
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg, d.sender_addr)
@@ -120,12 +121,6 @@ class NodeProtocol(TextUDPProtocol):
 		self.internet_addr = d.internetinfo
 
 	def getpeerinfo(self,peername):
-		"""
-		{
-			"cmd":"getpeerinfo",
-			"peername":"peername"
-		}
-		"""
 		self.loop.call_later(15, self.getpeerinfo, peername)
 		d = {
 			"cmd":"getpeerinfo",
@@ -153,7 +148,7 @@ class NodeProtocol(TextUDPProtocol):
 			"innerinfo":addr1
 		}
 		"""
-		print(self.config.nodeid,'getpeeriforesp(),d=',d.internetinfo)
+		print(self.config.nodeid,'getpeerinforesp(),d=',d,d.internetinfo)
 		rpubk = d.publickey
 		self.cpd.publickeys[d.peername] = rpubk
 		retdata = {
@@ -166,6 +161,8 @@ class NodeProtocol(TextUDPProtocol):
 		addr = tuple(d.internetinfo)
 		self.try_connect(msg,addr,d.nodeid)
 
+	def punching(self, peername):
+		
 	def try_connect(self, msg, addr, peername):
 		print(self.config.nodeid,'try connect to',peername,addr)
 		task = self.loop.call_later(0.5,self.try_connect,
@@ -214,5 +211,5 @@ if __name__ == '__main__':
 	server = serverFactory(NodeProtocol,'0.0.0.0',config.port)
 	server.heartbeat()
 	if len(sys.argv) > 2:
-		loop.call_later(30,server.getpeerinfo, sys.argv[2])
+		loop.call_later(10,server.getpeerinfo, sys.argv[2])
 	loop.run_forever()

@@ -82,6 +82,9 @@ class PeerData:
 		return DictObject(**d)
 
 	def setSendData(self,receiver,text,crypted='0',zipped='0'):
+		if receiver is None:
+			print('Error**********,receiver is None')
+			raise Exception('receiver is None')
 		if crypted == '0':
 			arr = [crypted,'0',self.myname,receiver,text]
 			return '|+|'.join(arr)
