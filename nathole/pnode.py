@@ -165,9 +165,9 @@ class NodeProtocol(TextUDPProtocol):
 			"from_addr":self.internet_addr
 		}
 		text = json.dumps(retdata)
-		msg = self.cpd.setSendData(d.nodeid,text)
-		addr = tuple(d.internetinfo)
-		self.try_connect(msg,addr,d.nodeid)
+		msg = self.cpd.setSendData(peer,text)
+		addr = tuple(self.peerInternetAddrs[peer])
+		self.try_connect(msg,addr,peer)
 		
 	def try_connect(self, msg, addr, peername):
 		print(self.config.nodeid,'try connect to',peername,addr)
