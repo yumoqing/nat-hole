@@ -152,12 +152,13 @@ class NodeProtocol(TextUDPProtocol):
 		"""
 		print(self.config.nodeid,'getpeerinforesp(),d=',d,d.internetinfo)
 		rpubk = d.publickey
-		self.peerInnerAddrs[d.nodeid] = d.addr1
-		self.peerInternetAddrs[d.nodeid] = d.addr
+		self.peerInnerAddrs[d.nodeid] = d.innerinfo
+		self.peerInternetAddrs[d.nodeid] = d.internetinfo
 		self.cpd.publickeys[d.peername] = rpubk
 		self.punching(d.nodeid)
 
 	def punching(self, peer):
+		print('punching',peer)
 		retdata = {
 			"cmd":"peer_connect",
 			"peer":peer,
@@ -165,6 +166,7 @@ class NodeProtocol(TextUDPProtocol):
 			"from_addr":self.internet_addr
 		}
 		text = json.dumps(retdata)
+		print('will send data=',text)
 		msg = self.cpd.setSendData(peer,text)
 		addr = tuple(self.peerInternetAddrs[peer])
 		self.try_connect(msg,addr,peer)
