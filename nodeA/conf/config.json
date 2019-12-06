@@ -2,7 +2,7 @@
 	"center":"bsppo.com",
 	"nodeid":"nodeA",
 	"iscenter":false,
-	"port":19993,
+	"port":5678,
 	"privatekey":"$[workdir]$/conf/nodeA.pem"
 }
 

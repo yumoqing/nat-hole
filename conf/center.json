@@ -2,7 +2,7 @@
 	"center":"bsppo.com",
 	"nodeid":"bsppo.com",
 	"heartbeat_timeout":5,
-	"port":19993,
+	"port":5678,
 	"privatekey":"$[workdir]$/conf/center.pem"
 }
 
