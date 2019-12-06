@@ -152,8 +152,8 @@ class NodeProtocol(TextUDPProtocol):
 		"""
 		print(self.config.nodeid,'getpeerinforesp(),d=',d,d.internetinfo)
 		rpubk = d.publickey
-		self.peerInnerAddr[d.nodeid] = d.addr1
-		self.peerInternetAddr[d.nodeid] = d.addr
+		self.peerInnerAddrs[d.nodeid] = d.addr1
+		self.peerInternetAddrs[d.nodeid] = d.addr
 		self.cpd.publickeys[d.peername] = rpubk
 		self.punching(d.nodeid)
 
@@ -194,7 +194,7 @@ class NodeProtocol(TextUDPProtocol):
 		if d.forwardfrom != d.forwarddata.nodeid:
 			return
 
-		self.peerInternetAddr[d.forwardfrom] = d.forwarddata.internetinfo
+		self.peerInternetAddrs[d.forwardfrom] = d.forwarddata.internetinfo
 		self.punching(d.forwardfrom)
 
 if __name__ == '__main__':
