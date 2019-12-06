@@ -30,6 +30,8 @@ class NodeProtocol(TextUDPProtocol):
 	def __init__(self):
 		self.config = getConfig()
 		self.peertasks = {}
+		self.peerInternetAddrs = {}
+		self.peerInnerAddrs = {}
 		self.rsaobj = RSA()
 		self.center_addr = gethostbyname(self.config.center), \
 					self.config.port
@@ -150,18 +152,22 @@ class NodeProtocol(TextUDPProtocol):
 		"""
 		print(self.config.nodeid,'getpeerinforesp(),d=',d,d.internetinfo)
 		rpubk = d.publickey
+		self.peerInnerAddr[d.nodeid] = d.addr1
+		self.peerInternetAddr[d.nodeid] = d.addr
 		self.cpd.publickeys[d.peername] = rpubk
+		self.punching(d.nodeid)
+
+	def punching(self, peer):
 		retdata = {
 			"cmd":"peer_connect",
-			"to_addr":d.internetinfo,
+			"peer":peer,
+			"to_addr":self.peerInternetAddr[peer]
 			"from_addr":self.internet_addr
 		}
 		text = json.dumps(retdata)
 		msg = self.cpd.setSendData(d.nodeid,text)
 		addr = tuple(d.internetinfo)
 		self.try_connect(msg,addr,d.nodeid)
-
-	def punching(self, peername):
 		
 	def try_connect(self, msg, addr, peername):
 		print(self.config.nodeid,'try connect to',peername,addr)
@@ -180,7 +186,7 @@ class NodeProtocol(TextUDPProtocol):
 			}
 		}
 		"""
-		print(self.config.nodeid,'forwardmsg(),d=',d.forwarddata.nodeid,d.forwarddata.internetinfo)
+		print(self.config.nodeid,'forwardmsg(),d=',d,d.forwarddata.nodeid,d.forwarddata.internetinfo)
 		if d.forwardto != self.config.nodeid:
 			print(self.config.nodeid,'forwardto is not me',d.forwardto)
 			return
@@ -188,15 +194,8 @@ class NodeProtocol(TextUDPProtocol):
 		if d.forwardfrom != d.forwarddata.nodeid:
 			return
 
-		b2a = {
-			"cmd":"peer_connect",
-			"to_addr":d.forwarddata.internetinfo,
-			"from_addr":self.internet_addr
-		}
-		txt = json.dumps(b2a)
-		msg = self.cpd.setSendData(d.forwardfrom, json.dumps(d)) 
-		addr = tuple(d.forwarddata.internetinfo)
-		self.try_connect(msg,addr,d.forwardfrom)
+		self.peerInternetAddr[d.forwardfrom] = d.forwarddata.internetinfo
+		self.punching(d.forwardfrom)
 
 if __name__ == '__main__':
 	from appPublic.folderUtils import ProgramPath
