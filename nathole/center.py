@@ -125,7 +125,7 @@ class CenterProtocol(TextUDPProtocol):
 			"cmd":"forwardmsg",
 			"forwardfrom":d.sender,
 			"forwardto":d.peername,
-			"forwarddata":self.nodeinfo.get(d.sender)
+			"fromattr":self.nodeinfo.get(d.sender)
 		}
 		text = json.dumps(forward)
 		msg = self.cpd.setSendData(d.peername,text)

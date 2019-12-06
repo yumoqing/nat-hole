@@ -58,7 +58,6 @@ class NodeProtocol(TextUDPProtocol):
 
 	def greeting(self,d):
 		print(self.config.nodeid,'greeting(),d=',d)
-		self.peertasks[d.sender].cancel()
 		d.cnt = d.cnt + 1
 		if d.cnt > 1:
 			return 
@@ -74,7 +73,17 @@ class NodeProtocol(TextUDPProtocol):
 		self.send(msg, addr)
 		
 	def peer_connect(self,d):
+		"""
+		received data
+		retdata = {
+			"cmd":"peer_connect",
+			"peer":peer,
+			"to_addr":self.peerInternetAddrs[peer],
+			"from_addr":self.internet_addr
+		}
+		"""
 		print(self.config.nodeid, 'peer_connect(),d=',d)
+		self.peertasks[d.sender].cancel()
 		self.direct_addrs[d.sender] = d.sender_addr
 		d = {
 			"cmd":"greeting",
@@ -83,7 +92,6 @@ class NodeProtocol(TextUDPProtocol):
 			"cnt":0,
 			"tonode":d.sender
 		}
-		[ t.cancel() for t in self.peertasks]
 		text = json.dumps(d)
 		msg = self.cpd.setSendData(d.sender,text)
 		self.send(msg, d.sender_addr)
@@ -180,23 +188,19 @@ class NodeProtocol(TextUDPProtocol):
 
 	def forwardmsg(self,d):
 		"""
-		{
+		forward = {
 			"cmd":"forwardmsg",
-			"forwardfrom":"xxx",
-			"forwardto":peername,
-			"forwarddata":{
-			}
+			"forwardfrom":d.sender,
+			"forwardto":d.peername,
+			"fromattr":self.nodeinfo.get(d.sender)
 		}
 		"""
-		print(self.config.nodeid,'forwardmsg(),d=',d,d.forwarddata.nodeid,d.forwarddata.internetinfo)
+		print(self.config.nodeid,'forwardmsg(),d=',d)
 		if d.forwardto != self.config.nodeid:
 			print(self.config.nodeid,'forwardto is not me',d.forwardto)
 			return
 
-		if d.forwardfrom != d.forwarddata.nodeid:
-			return
-
-		self.peerInternetAddrs[d.forwardfrom] = d.forwarddata.internetinfo
+		self.peerInternetAddrs[d.forwardfrom] = d.fromaddr
 		self.punching(d.forwardfrom)
 
 if __name__ == '__main__':
