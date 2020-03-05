@@ -22,13 +22,13 @@ except:
 	import json
 
 import socket
+from platform import platform
 
 from asyncio import DatagramProtocol
 from appPublic.rsa import RSA
 from appPublic.rc4 import RC4
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
-
 from appPublic.jsonConfig import getConfig
 
 def getlocalip():
@@ -156,6 +156,11 @@ def serverFactory(Klass, host,port,loop=None,coding='utf-8'):
 	listen = loop.create_datagram_endpoint(
 		Klass, local_addr=(host,port))
 	transport,server = loop.run_until_complete(listen)
+	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	os = platform()
+	if not os.startswith('Windows'):
+		transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+
 	server.coding = coding
 	server.loop = loop
 	server.port = port
@@ -167,6 +172,10 @@ def clientFactory(Klass, host,port,loop=None,coding='utf-8'):
 	connect = loop.create_datagram_endpoint(
 		Klass, remote_addr=(host,port))
 	transport,client = loop.run_until_complete(connect)
+	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	os = platform()
+	if not os.startswith('Windows'):
+		transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 	client.coding = coding
 	client._loop = loop
 	client.port = port
