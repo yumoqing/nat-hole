@@ -155,11 +155,11 @@ def serverFactory(Klass, host,port,loop=None,coding='utf-8'):
 		loop = asyncio.get_event_loop()
 	listen = loop.create_datagram_endpoint(
 		Klass, local_addr=(host,port))
-	transport,server = loop.run_until_complete(listen)
-	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	os = platform()
 	if not os.startswith('Windows'):
-		transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+		listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+	transport,server = loop.run_until_complete(listen)
 
 	server.coding = coding
 	server.loop = loop
@@ -171,11 +171,11 @@ def clientFactory(Klass, host,port,loop=None,coding='utf-8'):
 		loop = asyncio.get_event_loop()
 	connect = loop.create_datagram_endpoint(
 		Klass, remote_addr=(host,port))
-	transport,client = loop.run_until_complete(connect)
-	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	connect.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	os = platform()
 	if not os.startswith('Windows'):
-		transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+		connect.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+	transport,client = loop.run_until_complete(connect)
 	client.coding = coding
 	client._loop = loop
 	client.port = port
