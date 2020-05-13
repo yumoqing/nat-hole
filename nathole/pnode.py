@@ -12,7 +12,6 @@ from appPublic.uniqueID import getID
 from appPublic.jsonConfig import getConfig
 from appPublic.rsa import RSA
 from appPublic.dictObject import DictObject
-from sqlor.dbpools import DBPools
 
 from udppro import serverFactory,TextUDPProtocol, PeerData, getlocalip
 
