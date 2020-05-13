@@ -166,13 +166,6 @@ def clientFactory(Klass, host,port,loop=None,coding='utf-8'):
 		loop = asyncio.get_event_loop()
 	connect = loop.create_datagram_endpoint(
 		Klass, remote_addr=(host,port))
-<<<<<<< HEAD
-	connect.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	os = platform()
-	if not os.startswith('Windows'):
-		connect.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-=======
->>>>>>> 316bf27206658c96cb548335c04f6fb235bf86cf
 	transport,client = loop.run_until_complete(connect)
 	client.coding = coding
 	client._loop = loop
