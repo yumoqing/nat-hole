@@ -156,10 +156,10 @@ def serverFactory(Klass, host,port,loop=None,coding='utf-8'):
 	listen = loop.create_datagram_endpoint(
 		Klass, local_addr=(host,port))
 	transport,server = loop.run_until_complete(listen)
-	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	os = platform()
-	if not os.startswith('Windows'):
-		transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+	# transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	# os = platform()
+	# if not os.startswith('Windows'):
+	#	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
 	server.coding = coding
 	server.loop = loop
@@ -172,10 +172,6 @@ def clientFactory(Klass, host,port,loop=None,coding='utf-8'):
 	connect = loop.create_datagram_endpoint(
 		Klass, remote_addr=(host,port))
 	transport,client = loop.run_until_complete(connect)
-	transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	os = platform()
-	if not os.startswith('Windows'):
-		transport.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 	client.coding = coding
 	client._loop = loop
 	client.port = port
