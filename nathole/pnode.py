@@ -14,6 +14,8 @@ from appPublic.rsa import RSA
 from appPublic.dictObject import DictObject
 
 from udppro import serverFactory,TextUDPProtocol, PeerData, getlocalip
+from srudp import SecureReliableSocket
+from time import sleep, time
 
 class NodePeerData(PeerData):
 	def getPeerPublickey(self,peername):
@@ -27,6 +29,7 @@ class NodePeerData(PeerData):
 
 class NodeProtocol(TextUDPProtocol):
 	def __init__(self):
+		self.isClient = False
 		self.config = getConfig()
 		self.peertasks = {}
 		self.peertasks_cnt = {}
@@ -131,6 +134,7 @@ class NodeProtocol(TextUDPProtocol):
 		self.internet_addr = d.internetinfo
 
 	def getpeerinfo(self,peername):
+		self.isClient = True
 		self.loop.call_later(15, self.getpeerinfo, peername)
 		d = {
 			"cmd":"getpeerinfo",
@@ -167,6 +171,20 @@ class NodeProtocol(TextUDPProtocol):
 
 	def punching(self, peer):
 		print('punching',peer)
+		sock = SecureReliableSocket()
+		sock.connect(self.peerInternetAddrs[peer])
+		while not sock.is_closed:
+			if self.isClient:
+				sock.sendall(b'hello ' + str(time()).encode())
+				sleep(3)
+			else:
+				data = sock.recv(1024)
+				if not data:
+					break
+				print(time(), data)
+
+		return
+
 		retdata = {
 			"cmd":"peer_connect",
 			"peer":peer,
