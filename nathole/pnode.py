@@ -172,7 +172,7 @@ class NodeProtocol(TextUDPProtocol):
 	def punching(self, peer):
 		print('punching',peer)
 		sock = SecureReliableSocket()
-		sock.connect(self.peerInternetAddrs[peer])
+		sock.connect(tuple(self.peerInternetAddrs[peer]))
 		while not sock.is_closed:
 			if self.isClient:
 				sock.sendall(b'hello ' + str(time()).encode())
