@@ -19,10 +19,12 @@ def threaded_function(arg):
 UDPSock.sendto(data.encode('utf-8'),addr)
 #接收伺服器回傳的另一台主機IP:PORT
 dest,adr = UDPSock.recvfrom(1024)
+dest = dest.decode('utf-8')
+ip,port = dest.split(':')
 print( 'send ping to ' , dest)
 #進行打洞
-dest = dest.decode('utf-8')
-UDPSock.sendto(b'ping', (dest.split(':')[0], int(dest.split(':')[1])))
+port = int(port)
+UDPSock.sendto(b'ping', (ip,port))
 thread = Thread(target = threaded_function, args = (dest, ))
 thread.start()
 
