@@ -21,7 +21,7 @@ UDPSock.sendto(data.encode('utf-8'),addr)
 dest,adr = UDPSock.recvfrom(1024)
 print( 'send ping to ' , dest)
 #進行打洞
-dest = desc.decode('utf-8')
+dest = dest.decode('utf-8')
 UDPSock.sendto(b'ping', (dest.split(':')[0], int(dest.split(':')[1])))
 thread = Thread(target = threaded_function, args = (dest, ))
 thread.start()
