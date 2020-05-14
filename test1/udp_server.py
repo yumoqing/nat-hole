@@ -12,7 +12,7 @@ ips = []
 while True:
     #接收資料
     data, addr = UDPSock.recvfrom(1024)
-    print addr , 'is connected.'
+    print(addr , 'is connected.')
     #將Client IP:Port 儲存到Array內
 	data = data.decode('utf-8')
     ips.append(str(addr[0]) + ':' + str(addr[1]))
