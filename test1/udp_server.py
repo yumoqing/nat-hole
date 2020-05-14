@@ -25,4 +25,4 @@ while True:
                     dest = i # 對方的IP
                 #將A的IP傳給B，B的IP傳給A
                 UDPSock.sendto(dest.encode('utf-8'), (ip.split(':')[0],int(ip.split(':')[1])))
- 
+ 		ips = []
