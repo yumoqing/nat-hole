@@ -10,9 +10,20 @@ class Tracker(object):
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.s.bind(('0.0.0.0', self.track_dict['this'][1]))
 
+	def send(self, s, addr):
+		b = s
+		if isinstance(s, str):
+			b = s.encode(s,'utf-8')
+		self.s.sendto(msg, addr)
+
+	def recv(self, recv_len=1024):
+		(data,addr) = self.s.recvfrom(recv_len)
+		data = data.decode('utf-8')
+		return data, addr
+
 	def listen(self):
 		while 1:
-			(data,addr)= self.s.recvfrom(1024)
+			(data,addr)= self.recv()
 			data = data.split(',')
 			session_name = data[0]
 			offset = data[1]

@@ -5,12 +5,20 @@ from select import select
 import json, time, random
 from punchobject import PunchObject
 
+class NatHole_Env(object):
+	def __init__(self, server_ip, server_port):
+		self.server_port = server_port
+		self.server_ip = server_ip
+
+	def server_addr(self):
+		return (self.server_ip, server_port)
+
+
 class Endpoint(object):
 	track_dict = {}
 	session_name = []
-	SERVER_PORT = 60000
-	SERVER_IP = '192.43.193.103'
-	def __init__(self, session_name):
+	def __init__(self, env, session_name):
+		self.env = env
 		self.session_name=session_name
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.s.setblocking(0)
@@ -20,11 +28,24 @@ class Endpoint(object):
 		self.s.bind(('0.0.0.0', prt))
 		print("bound to port ", prt)
 		
-	def send_request(self, server_ip, server_port, offset):
-		self.SERVER_PORT = server_port
-		self.SERVER_IP = server_ip
-		self.s.sendto("%s,%d" % (self.session_name, offset) , (server_ip, server_port))
-		data,addr=self.s.recvfrom(1024)
+	def send(self, s, addr):
+		b = s
+		if isinstance(s,bytes):
+			b = s
+		else if isinstance(s,str):
+			b = s.encode('utf-8')
+		else:
+			b = json.dumps(s)
+		self.s.sendto(b,addr)
+
+	def recv(self, recv_len=1024):
+		data, addr = self.s.recvfrom(recv_len)
+		data = data.decode('utf-8')
+		return data, addr
+
+	def send_request(self, offset):
+		self.send("%s,%d" % (self.session_name, offset) , self.env.server_addr())
+		data,addr=self.recv()
 		self.dat = PunchObject(data)
 		if self.dat.JSON:
 			self.track_dict = json.loads(data[1:])
@@ -46,9 +67,9 @@ class Endpoint(object):
 			if w:
 				if count%4==0:
 					if my_pub_offset!=None:
-						self.send_request(self.SERVER_IP, self.SERVER_PORT, my_pub_offset)
+						self.send_request(my_pub_offset)
 					else:
-						self.send_request(self.SERVER_IP, self.SERVER_PORT, 0)
+						self.send_request(0)
 					r_addr = self.track_dict[remote_name]
 					r_offset = r_addr[2]
 					r_addr = r_addr[0], r_addr[1]
@@ -56,7 +77,7 @@ class Endpoint(object):
 
 				if connected:
 					print("send msg")
-					self.s.sendto(self.dat.compose('MSG', "%s offsetted msg: %s has public offset: %s" % (count, self.session_name, my_pub_offset)), (r_addr[0], r_addr[1]+remote_offset))
+					self.send(self.dat.compose('MSG', "%s offsetted msg: %s has public offset: %s" % (count, self.session_name, my_pub_offset)), (r_addr[0], r_addr[1]+remote_offset))
 					print(r_addr[1]+remote_offset)
 
 				mx = (5 + r_offset + count*2)%65536
@@ -71,16 +92,16 @@ class Endpoint(object):
 						if i!=my_pub_offset:
 							if not self.dat.SYN and not self.dat.ACK or my_pub_offset != None:
 								msg = self.dat.compose('SYN', "%s %s,%s"%(count, self.session_name, i) )#SYN mit offset
-								self.s.sendto(msg, (r_addr[0], r_addr[1]+i))
+								self.send(msg, (r_addr[0], r_addr[1]+i))
 								syn_time = time.time()
 	
 				if self.dat.SYN:
 					for i in range(mn,mx):
 						if i!=my_pub_offset:
 					msg = self.dat.compose('ACK',"%s %s,%s" % (count, self.session_name, my_pub_offset) )
-					self.s.sendto(msg, (r_addr[0], r_addr[1]+i))
+					self.send(msg, (r_addr[0], r_addr[1]+i))
 			if r:
-				data,addr=self.s.recvfrom(1024)
+				data,addr=self.recv()
 				print("data: ", data)
 				self.dat = PunchObject(data)
 				if self.dat.MSG:
