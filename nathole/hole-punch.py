@@ -4,6 +4,7 @@ import socket
 from select import select
 import json, time, random
 from punchobject import PunchObject
+from appPublic.background import Background
 
 class NatHole_Env(object):
 	def __init__(self, server_ip, server_port):
@@ -28,6 +29,18 @@ class Endpoint(object):
 		self.s.bind(('0.0.0.0', prt))
 		print("bound to port ", prt)
 		self.p2plist = {}
+		self.heartbeat()
+
+	def heartbeat(self):
+		self.heartbeat = True
+		self.hb_time = 5
+		def hb():
+			while self.heartbeat:
+				self.send_request(0)
+				time.sleep(self.hb_time)
+
+		b = Background(hb)
+		b.start()
 
 	def send(self, s, addr):
 		b = s
@@ -52,6 +65,15 @@ class Endpoint(object):
 			self.track_dict = json.loads(data[1:])
 		
 	def connect_endpoint(self, remote_name):
+		t = 0
+		while t < 999999:
+			if self.track_dict.get(remote_name):
+				break
+			time.sleep(1)
+			t += 1
+			if t > 30:
+				raise Exception(f'{remote_name} not registed')
+
 		"""connect to another endpoint"""
 		acc = 0.5 #TODO: implement sleep "growth"
 		print(self.track_dict)
@@ -73,60 +95,38 @@ class Endpoint(object):
 						self.send_request(0)
 
 					r_addr = self.track_dict.get(remote_name)
-					if r_addr == None:
-						r_offset = 0
-						continue
-					r_offset = r_addr[2]
 					r_addr = r_addr[0], r_addr[1]
-					print("addr update")
+					print("addr update",r_addr)
 
 				if connected:
-					print("send msg")
-					self.send(self.dat.compose('MSG', "%s offsetted msg: %s has public offset: %s" % (count, self.session_name, my_pub_offset)), (r_addr[0], r_addr[1]+remote_offset))
-					print(r_addr[1]+remote_offset)
+					print("send msg to", r_addr)
+					self.send(self.dat.compose('MSG', "%s offsetted msg: %s has public offset: %s" % (count, self.session_name, my_pub_offset)), r_addr)
 
-				mx = (5 + r_offset + count*2)%65536
-				mn =		 (r_offset)%65536-count-5
-
-				if mn>mx:
-					mn = mx+1
-				if remote_offset==None:# and not connected:
-					print("probing offset in range: ", mn+r_addr[1], mx+r_addr[1])
-					for i in range(mn,mx):
-						#if count<20#if my_pub_offset == None or remote_offset==None:
-						if i!=my_pub_offset:
-							if not self.dat.SYN and not self.dat.ACK or my_pub_offset != None:
-								msg = self.dat.compose('SYN', "%s %s,%s"%(count, self.session_name, i) )#SYN mit offset
-								self.send(msg, (r_addr[0], r_addr[1]+i))
-								syn_time = time.time()
+				if not self.dat.SYN and not self.dat.ACK:
+					msg = self.dat.compose('SYN', "%s %s,%s"%(count, self.session_name, 0) )#SYN mit offset
+					self.send(msg, r_addr)
+					syn_time = time.time()
 	
 				if self.dat.SYN:
-					for i in range(mn,mx):
-						if i!=my_pub_offset:
-							msg = self.dat.compose('ACK',"%s %s,%s" % \
-										(count, self.session_name, my_pub_offset) )
-							self.send(msg, (r_addr[0], r_addr[1]+i))
+					msg = self.dat.compose('ACK',"%s %s,%s" % \
+								(count, self.session_name, 0) )
+					self.send(msg, r_addr)
 			if r:
 				data,addr=self.recv()
 				print("data: ", data)
 				self.dat = PunchObject(data)
 				if self.dat.MSG:
 					num_nomsg = 0
-					print(str(self.dat))
+					print(str(self.dat), ':', addr)
 				elif self.dat.SYN:
-					print("recvd SYN ", str(self.dat))
-					if my_pub_offset == None and not self.session_name in data[1:]:
-						my_pub_offset = int(data[1:].split(",")[-1])
-						synned = True
+					print("recvd SYN ", str(self.dat), ':', addr)
+					synned = True
 				elif self.dat.ACK:
-					str_ro = data[1:].split(",")[-1]
-					if str_ro != "None":
-						remote_offset = int(str_ro)
 					ack_time = time.time()-syn_time
-					print("recvd ACK ", str(self.dat), ack_time)
+					print("recvd ACK ", str(self.dat), ack_time, ':', addr)
 					if synned:
 						connected = True
-						print("Connected.", remote_name, addr)
+						print("Connected.", remote_name, ':', addr)
 						self.p2plist[remote_name] = addr
 				elif self.dat.JSON:
 					self.track_dict = json.loads(data[1:])
