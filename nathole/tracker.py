@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+import sys
 import socket, json
 from punchobject import PunchObject
 
 class Tracker(object):
-	track_dict = {'this': ['localhost', 60000, 0]}
+	track_dict = {}
 	
-	def __init__(self):
+	def __init__(self, port):
+		self.track_dict['this'] = ['localhost', port, 0]
 		self.p = PunchObject("")
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.s.bind(('0.0.0.0', self.track_dict['this'][1]))
@@ -13,8 +15,8 @@ class Tracker(object):
 	def send(self, s, addr):
 		b = s
 		if isinstance(s, str):
-			b = s.encode(s,'utf-8')
-		self.s.sendto(msg, addr)
+			b = s.encode('utf-8')
+		self.s.sendto(b, addr)
 
 	def recv(self, recv_len=1024):
 		(data,addr) = self.s.recvfrom(recv_len)
@@ -29,9 +31,12 @@ class Tracker(object):
 			offset = data[1]
 			self.track_dict[session_name] = [addr[0], int(addr[1]), int(offset)]
 			msg = self.p.compose('JSON', json.dumps(self.track_dict))
-			self.s.sendto( msg, addr)
+			self.send( msg, addr)
 			print(self.track_dict)
 
 
-t = Tracker()
+port = 50000
+if len(sys.argv) >= 2:
+	port = int(sys.argv[1])
+t = Tracker(port)
 t.listen()

@@ -22,6 +22,6 @@ class PunchObject(object):
 
 	def compose(self, flag, data):
 		#if len(self._types_inv)==0:
-		self._types_inv = dict( (v,k) for k, v in self._types.iteritems())
+		self._types_inv = dict( (v,k) for k, v in self._types.items())
 		return str("%s%s" % (self._types_inv[flag], data))
 	

@@ -7,11 +7,11 @@ from punchobject import PunchObject
 
 class NatHole_Env(object):
 	def __init__(self, server_ip, server_port):
+		self.server_ip = socket.gethostbyname(server_ip)
 		self.server_port = server_port
-		self.server_ip = server_ip
 
 	def server_addr(self):
-		return (self.server_ip, server_port)
+		return (self.server_ip, self.server_port)
 
 
 class Endpoint(object):
@@ -27,12 +27,13 @@ class Endpoint(object):
 		prt = self.rand.randint(20000,20005)
 		self.s.bind(('0.0.0.0', prt))
 		print("bound to port ", prt)
-		
+		self.p2plist = {}
+
 	def send(self, s, addr):
 		b = s
 		if isinstance(s,bytes):
 			b = s
-		else if isinstance(s,str):
+		elif isinstance(s,str):
 			b = s.encode('utf-8')
 		else:
 			b = json.dumps(s)
@@ -61,7 +62,7 @@ class Endpoint(object):
 		syn_time=0
 		ack_time=0
 		self.dat = PunchObject("")
-		for count in xrange(550):
+		for count in range(550):
 			print("versuch %s" % count)
 			r,w,x = select([self.s], [self.s], [], 0)
 			if w:
@@ -70,7 +71,10 @@ class Endpoint(object):
 						self.send_request(my_pub_offset)
 					else:
 						self.send_request(0)
-					r_addr = self.track_dict[remote_name]
+
+					r_addr = self.track_dict.get(remote_name)
+					if r_addr == None:
+						continue
 					r_offset = r_addr[2]
 					r_addr = r_addr[0], r_addr[1]
 					print("addr update")
@@ -98,8 +102,9 @@ class Endpoint(object):
 				if self.dat.SYN:
 					for i in range(mn,mx):
 						if i!=my_pub_offset:
-					msg = self.dat.compose('ACK',"%s %s,%s" % (count, self.session_name, my_pub_offset) )
-					self.send(msg, (r_addr[0], r_addr[1]+i))
+							msg = self.dat.compose('ACK',"%s %s,%s" % \
+										(count, self.session_name, my_pub_offset) )
+							self.send(msg, (r_addr[0], r_addr[1]+i))
 			if r:
 				data,addr=self.recv()
 				print("data: ", data)
@@ -120,7 +125,8 @@ class Endpoint(object):
 					print("recvd ACK ", str(self.dat), ack_time)
 					if synned:
 						connected = True
-						print("Connected.")
+						print("Connected.", remote_name, addr)
+						self.p2plist[remote_name] = addr
 				elif self.dat.JSON:
 					self.track_dict = json.loads(data[1:])
 				else:
@@ -128,12 +134,11 @@ class Endpoint(object):
 			time.sleep(acc)
 		
 if __name__ == "__main__":
-	SERVER_IP = '192.43.193.103'
-	SERVER_PORT = 60000
-	if len(sys.argv)<3:
-		print("------------------\nUsage: python hole-punch.py your-name target-name\n")
+	if len(sys.argv) < 5:
+		print("------------------\nUsage: python server_ip server_port hole-punch.py your-name target-name\n")
 		exit(0)
-	name = sys.argv[1]
-	connect_name = sys.argv[2]
-	pt = Endpoint(name)
+	env = NatHole_Env(sys.argv[1], int(sys.argv[2]))
+	name = sys.argv[3]
+	connect_name = sys.argv[4]
+	pt = Endpoint(env, name)
 	pt.connect_endpoint(connect_name)
