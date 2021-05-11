@@ -74,6 +74,7 @@ class Endpoint(object):
 
 					r_addr = self.track_dict.get(remote_name)
 					if r_addr == None:
+						r_offset = 0
 						continue
 					r_offset = r_addr[2]
 					r_addr = r_addr[0], r_addr[1]
