@@ -94,17 +94,21 @@ class Endpoint(object):
 
 				if connected:
 					print("send msg to", r_addr)
-					self.send(self.dat.compose('MSG', "%s offsetted msg: %s has public offset: %s" % (count, self.session_name, my_pub_offset)), r_addr)
+					msg = self.dat.compose('MSG', "%s offsetted msg: %s has public offset: %s" % (count, self.session_name, my_pub_offset))
+					self.send(msg, r_addr)
+					print('send :', msg)
 
 				if not self.dat.SYN and not self.dat.ACK:
 					msg = self.dat.compose('SYN', "%s %s,%s"%(count, self.session_name, 0) )#SYN mit offset
 					self.send(msg, r_addr)
+					print('send :', msg)
 					syn_time = time.time()
 	
 				if self.dat.SYN:
 					msg = self.dat.compose('ACK',"%s %s,%s" % \
 								(count, self.session_name, 0) )
 					self.send(msg, r_addr)
+					print('send :', msg)
 			if r:
 				data,addr=self.recv()
 				print("data: ", data)
