@@ -88,15 +88,9 @@ class Endpoint(object):
 			print("versuch %s" % count)
 			r,w,x = select([self.s], [self.s], [], 0)
 			if w:
-				if count%4==0:
-					if my_pub_offset!=None:
-						self.send_request(my_pub_offset)
-					else:
-						self.send_request(0)
-
-					r_addr = self.track_dict.get(remote_name)
-					r_addr = r_addr[0], r_addr[1]
-					print("addr update",r_addr)
+				r_addr = self.track_dict.get(remote_name)
+				r_addr = r_addr[0], r_addr[1]
+				print("addr update",r_addr)
 
 				if connected:
 					print("send msg to", r_addr)
