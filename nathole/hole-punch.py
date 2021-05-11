@@ -101,14 +101,14 @@ class Endpoint(object):
 				if not self.dat.SYN and not self.dat.ACK:
 					msg = self.dat.compose('SYN', "%s %s,%s"%(count, self.session_name, 0) )#SYN mit offset
 					self.send(msg, r_addr)
-					print('send :', msg)
+					print('No:send :', msg)
 					syn_time = time.time()
 	
 				if self.dat.SYN:
 					msg = self.dat.compose('ACK',"%s %s,%s" % \
 								(count, self.session_name, 0) )
 					self.send(msg, r_addr)
-					print('send :', msg)
+					print('SYNed:send :', msg)
 			if r:
 				data,addr=self.recv()
 				print("data: ", data)
